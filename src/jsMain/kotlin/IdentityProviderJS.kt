@@ -1,5 +1,6 @@
 @file:JsExport
 
+import IdentityProviderExceptionJs.*
 import com.liftric.cognito.idp.IdentityProviderClient
 import com.liftric.cognito.idp.core.*
 import kotlinx.coroutines.MainScope
@@ -246,27 +247,29 @@ class IdentityProviderClientJS(region: String, clientId: String) {
             val wrapped: IdentityProviderExceptionJs = when(val t = value.exception) {
                 is IdentityProviderException -> {
                     when(t) {
-                        is IdentityProviderException.CodeMismatch -> IdentityProviderExceptionJs.CodeMismatch(t.status.value, t.message)
-                        is IdentityProviderException.ConcurrentModification -> IdentityProviderExceptionJs.ConcurrentModification(t.status.value, t.message)
-                        is IdentityProviderException.EnableSoftwareTokenMFA -> IdentityProviderExceptionJs.EnableSoftwareTokenMFA(t.status.value, t.message)
-                        is IdentityProviderException.ExpiredCode -> IdentityProviderExceptionJs.ExpiredCode(t.status.value, t.message)
-                        is IdentityProviderException.InternalError -> IdentityProviderExceptionJs.InternalError(t.status.value, t.message)
-                        is IdentityProviderException.InvalidLambdaResponse -> IdentityProviderExceptionJs.InvalidLambdaResponse(t.status.value, t.message)
-                        is IdentityProviderException.InvalidParameter -> IdentityProviderExceptionJs.InvalidParameter(t.status.value, t.message)
-                        is IdentityProviderException.InvalidPassword -> IdentityProviderExceptionJs.InvalidPassword(t.status.value, t.message)
-                        is IdentityProviderException.InvalidUserPoolConfiguration -> IdentityProviderExceptionJs.InvalidUserPoolConfiguration(t.status.value, t.message)
-                        is IdentityProviderException.LimitExceeded -> IdentityProviderExceptionJs.LimitExceeded(t.status.value, t.message)
-                        is IdentityProviderException.NotAuthorized -> IdentityProviderExceptionJs.NotAuthorized(t.status.value, t.message)
-                        is IdentityProviderException.PasswordResetRequired -> IdentityProviderExceptionJs.PasswordResetRequired(t.status.value, t.message)
-                        is IdentityProviderException.ResourceNotFound -> IdentityProviderExceptionJs.ResourceNotFound(t.status.value, t.message)
-                        is IdentityProviderException.SoftwareTokenMFANotFound -> IdentityProviderExceptionJs.SoftwareTokenMFANotFound(t.status.value, t.message)
-                        is IdentityProviderException.TooManyFailedAttempts -> IdentityProviderExceptionJs.TooManyFailedAttempts(t.status.value, t.message)
-                        is IdentityProviderException.TooManyRequests -> IdentityProviderExceptionJs.TooManyRequests(t.status.value, t.message)
-                        is IdentityProviderException.UnexpectedLambda -> IdentityProviderExceptionJs.UnexpectedLambda(t.status.value, t.message)
-                        is IdentityProviderException.Unknown -> IdentityProviderExceptionJs.Unknown(t.status.value, t.type, t.message)
-                        is IdentityProviderException.UserLambdaValidation -> IdentityProviderExceptionJs.UserLambdaValidation(t.status.value, t.message)
-                        is IdentityProviderException.UserNotConfirmed -> IdentityProviderExceptionJs.UserNotConfirmed(t.status.value, t.message)
-                        is IdentityProviderException.UserNotFound -> IdentityProviderExceptionJs.UserNotFound(t.status.value, t.message)
+                        is IdentityProviderException.CodeMismatch -> CodeMismatch(t.status.value, t.message)
+                        is IdentityProviderException.ConcurrentModification -> ConcurrentModification(t.status.value, t.message)
+                        is IdentityProviderException.EnableSoftwareTokenMFA -> EnableSoftwareTokenMFA(t.status.value, t.message)
+                        is IdentityProviderException.ExpiredCode -> ExpiredCode(t.status.value, t.message)
+                        is IdentityProviderException.InternalError -> InternalError(t.status.value, t.message)
+                        is IdentityProviderException.InvalidLambdaResponse -> InvalidLambdaResponse(t.status.value, t.message)
+                        is IdentityProviderException.InvalidParameter -> InvalidParameter(t.status.value, t.message)
+                        is IdentityProviderException.InvalidPassword -> InvalidPassword(t.status.value, t.message)
+                        is IdentityProviderException.InvalidUserPoolConfiguration -> InvalidUserPoolConfiguration(t.status.value, t.message)
+                        is IdentityProviderException.LimitExceeded -> LimitExceeded(t.status.value, t.message)
+                        is IdentityProviderException.NotAuthorized -> NotAuthorized(t.status.value, t.message)
+                        is IdentityProviderException.PasswordResetRequired -> PasswordResetRequired(t.status.value, t.message)
+                        is IdentityProviderException.ResourceNotFound -> ResourceNotFound(t.status.value, t.message)
+                        is IdentityProviderException.SoftwareTokenMFANotFound -> SoftwareTokenMFANotFound(t.status.value, t.message)
+                        is IdentityProviderException.TooManyFailedAttempts -> TooManyFailedAttempts(t.status.value, t.message)
+                        is IdentityProviderException.TooManyRequests -> TooManyRequests(t.status.value, t.message)
+                        is IdentityProviderException.UnexpectedLambda -> UnexpectedLambda(t.status.value, t.message)
+                        is IdentityProviderException.Unknown -> Unknown(t.status.value, t.type, t.message)
+                        is IdentityProviderException.UserLambdaValidation -> UserLambdaValidation(t.status.value, t.message)
+                        is IdentityProviderException.UserNotConfirmed -> UserNotConfirmed(t.status.value, t.message)
+                        is IdentityProviderException.UserNotFound -> UserNotFound(t.status.value, t.message)
+                        is IdentityProviderException.InvalidSocialToken -> InvalidSocialToken(t.status.value, t.message)
+                        is IdentityProviderException.SocialAuthFailed -> SocialAuthFailed(t.status.value, t.message)
                     }
                 }
                 else -> IdentityProviderExceptionJs.NonCognitoException(t)

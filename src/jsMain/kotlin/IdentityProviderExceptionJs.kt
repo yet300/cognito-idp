@@ -1,5 +1,9 @@
 @file:JsExport
 
+import com.liftric.cognito.idp.core.IdentityProviderException
+import io.ktor.http.HttpStatusCode
+
+
 sealed class IdentityProviderExceptionJs(open val status: Int, override val message: String?) : Exception(message) {
     class CodeMismatch(override val status: Int, override val message: String?) : IdentityProviderExceptionJs(status, message)
     class ConcurrentModification(override val status: Int, override val message: String?) : IdentityProviderExceptionJs(status, message)
@@ -26,4 +30,6 @@ sealed class IdentityProviderExceptionJs(open val status: Int, override val mess
         override val cause: Throwable?,
         override val message: String? = "unknown non-cognito exception occurred, check the cause"
     ) : IdentityProviderExceptionJs(-999, message)
+    class InvalidSocialToken(status: Int, message: String?) : IdentityProviderExceptionJs(status, message)
+    class SocialAuthFailed(status: Int, message: String?) : IdentityProviderExceptionJs(status, message)
 }

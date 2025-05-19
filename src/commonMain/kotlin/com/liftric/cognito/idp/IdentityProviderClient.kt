@@ -1,15 +1,58 @@
 package com.liftric.cognito.idp
 
-import com.liftric.cognito.idp.core.*
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import com.liftric.cognito.idp.core.AWSException
+import com.liftric.cognito.idp.core.AccessToken
+import com.liftric.cognito.idp.core.AssociateSoftwareToken
+import com.liftric.cognito.idp.core.AssociateSoftwareTokenResponse
+import com.liftric.cognito.idp.core.Authentication
+import com.liftric.cognito.idp.core.ChangePassword
+import com.liftric.cognito.idp.core.ConfirmForgotPassword
+import com.liftric.cognito.idp.core.ConfirmSignUp
+import com.liftric.cognito.idp.core.Engine
+import com.liftric.cognito.idp.core.ForgotPassword
+import com.liftric.cognito.idp.core.ForgotPasswordResponse
+import com.liftric.cognito.idp.core.GetAttributeVerificationCodeResponse
+import com.liftric.cognito.idp.core.GetUserAttributeVerificationCode
+import com.liftric.cognito.idp.core.GetUserResponse
+import com.liftric.cognito.idp.core.Header
+import com.liftric.cognito.idp.core.IdentityProvider
+import com.liftric.cognito.idp.core.IdentityProviderException
+import com.liftric.cognito.idp.core.MfaSettings
+import com.liftric.cognito.idp.core.Refresh
+import com.liftric.cognito.idp.core.Request
+import com.liftric.cognito.idp.core.RequestError
+import com.liftric.cognito.idp.core.ResendConfirmationCode
+import com.liftric.cognito.idp.core.ResendConfirmationCodeResponse
+import com.liftric.cognito.idp.core.RespondToAuthChallenge
+import com.liftric.cognito.idp.core.Result
+import com.liftric.cognito.idp.core.RevokeToken
+import com.liftric.cognito.idp.core.SetUserMFAPreference
+import com.liftric.cognito.idp.core.SignIn
+import com.liftric.cognito.idp.core.SignInResponse
+import com.liftric.cognito.idp.core.SignUp
+import com.liftric.cognito.idp.core.SignUpResponse
+import com.liftric.cognito.idp.core.SocialProvider
+import com.liftric.cognito.idp.core.UpdateUserAttributes
+import com.liftric.cognito.idp.core.UpdateUserAttributesResponse
+import com.liftric.cognito.idp.core.UserAttribute
+import com.liftric.cognito.idp.core.VerifySoftwareToken
+import com.liftric.cognito.idp.core.VerifySoftwareTokenResponse
+import com.liftric.cognito.idp.core.VerifyUserAttribute
+import com.liftric.cognito.idp.social.SocialAuthConfig
+import com.liftric.cognito.idp.social.SocialAuthProvider
+import com.liftric.cognito.idp.social.SocialIdentityProvider
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.accept
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -19,7 +62,12 @@ import kotlinx.serialization.json.Json
  * AWS Cognito Identity Provider client.
  * Provides common request methods.
  */
-open class IdentityProviderClient(region: String, clientId: String, engine: HttpClientEngine? = null) : IdentityProvider {
+open class IdentityProviderClient(
+    region: String,
+    clientId: String,
+    engine: HttpClientEngine? = null,
+    socialAuthConfig: SocialAuthConfig? = null
+) : IdentityProvider {
     private val json = Json {
         allowStructuredMapKeys = true
         ignoreUnknownKeys = true
@@ -42,13 +90,17 @@ open class IdentityProviderClient(region: String, clientId: String, engine: Http
         }
     }
 
-    constructor(region: String, clientId: String) : this(region, clientId, null)
+    private val socialAuthProvider: SocialIdentityProvider? = socialAuthConfig?.let {
+        SocialAuthProvider(it, this, engine)
+    }
+
+    constructor(region: String, clientId: String) : this(region, clientId, null, null)
 
     override suspend fun signUp(
         username: String,
         password: String,
         attributes: List<UserAttribute>?,
-        clientMetadata: Map<String, String>?,
+        clientMetadata: Map<String, String>?
     ): Result<SignUpResponse> = request(
         Request.SignUp,
         SignUp(
@@ -56,7 +108,7 @@ open class IdentityProviderClient(region: String, clientId: String, engine: Http
             Username = username,
             Password = password,
             UserAttributes = attributes ?: listOf(),
-            ClientMetadata = clientMetadata,
+            ClientMetadata = clientMetadata
         )
     )
 
@@ -113,7 +165,7 @@ open class IdentityProviderClient(region: String, clientId: String, engine: Http
     ): Result<SignInResponse> = request(
         Request.RespondToAuthChallenge,
         RespondToAuthChallenge(
-            ChallengeName =  challengeName,
+            ChallengeName = challengeName,
             ChallengeResponses = challengeResponses,
             ClientId = configuration.clientId,
             Session = session
@@ -275,6 +327,22 @@ open class IdentityProviderClient(region: String, clientId: String, engine: Http
             UserCode = userCode
         )
     )
+
+    override suspend fun socialLogin(
+        provider: SocialProvider,
+        authCode: String
+    ): Result<SignInResponse> =
+        socialAuthProvider?.socialLogin(provider, authCode)
+            ?: Result.failure(IllegalStateException("Social auth provider not configured"))
+
+
+    override suspend fun validateSocialToken(
+        provider: SocialProvider,
+        token: String
+    ): Result<Unit> =
+        socialAuthProvider?.validateSocialToken(provider, token)
+            ?: Result.failure(IllegalStateException("Social auth provider not configured"))
+
 
     override suspend fun setUserMFAPreference(
         accessToken: String,

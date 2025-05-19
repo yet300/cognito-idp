@@ -198,4 +198,19 @@ interface IdentityProvider {
         userCode: String
     ): Result<VerifySoftwareTokenResponse>
 
+    /**
+     * Initiates social login with the specified provider
+     * @param provider The social provider (Google or Facebook)
+     * @param authCode The authorization code from the provider
+     * @return Result containing SignInResponse with Cognito JWTs on success or an error on failure
+     */
+    suspend fun socialLogin(provider: SocialProvider, authCode: String): Result<SignInResponse>
+
+    /**
+     * Validates a social provider's token
+     * @param provider The social provider
+     * @param token The token to validate
+     * @return Result containing Unit on success or an error on failure
+     */
+    suspend fun validateSocialToken(provider: SocialProvider, token: String): Result<Unit>
 }

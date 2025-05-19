@@ -24,4 +24,6 @@ sealed class IdentityProviderException(val status: HttpStatusCode, message: Stri
     class UserNotConfirmed(status: HttpStatusCode, message: String): IdentityProviderException(status, message)
     class UserNotFound(status: HttpStatusCode, message: String): IdentityProviderException(status, message)
     class Unknown(status: HttpStatusCode, val type: String, message: String): IdentityProviderException(status, message)
+    class InvalidSocialToken(status: HttpStatusCode, message: String) : IdentityProviderException(status, message)
+    class SocialAuthFailed(status: HttpStatusCode, message: String) : IdentityProviderException(status, message)
 }
