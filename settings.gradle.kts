@@ -18,7 +18,7 @@ dependencyResolutionManagement {
         create("libs") {
             version("android-tools-gradle", "8.1.0")
             version("kotlin", "1.9.10")
-            version("ktor", "2.3.5")
+            version("ktor", "3.1.3")
 
             library("ktor-client-core", "io.ktor", "ktor-client-core").versionRef("ktor")
             library("ktor-client-android", "io.ktor", "ktor-client-android").versionRef("ktor")
