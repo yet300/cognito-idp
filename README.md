@@ -270,6 +270,120 @@ Deletes the user from the user pool.
 deleteUser("<accessToken>"): Result<Unit>
 ```
 
+#### Social Authentication
+Enables authentication via social providers (e.g., Google, Facebook) using OAuth 2.0 flows. This requires additional configuration for social providers and integration with a Cognito User Pool configured for federated identities.
+
+Configuration
+To use social authentication, initialize the IdentityProviderClient with a SocialAuthConfig containing the client ID, client secret, redirect URI, region, and user pool ID for your social provider.
+
+
+```kotlin
+val socialAuthConfig = SocialAuthConfig(
+clientId = "<social-client-id>", // e.g., Google Client ID
+clientSecret = "<social-client-secret>", // e.g., Google Client Secret
+redirectUri = "<redirect-uri>", // e.g., "app://callback"
+region = "<region>", // e.g., "us-east-1"
+userPoolId = "<user-pool-id>" // e.g., "us-east-1_abc123"
+)
+val provider = IdentityProviderClient(
+region = "<region>",
+clientId = "<cognito-client-id>",
+socialAuthConfig = socialAuthConfig
+)
+```
+
+```typescript
+import { IdentityProviderClientJS, SocialAuthConfig } from '@liftric/cognito-idp';
+
+const socialAuthConfig: SocialAuthConfig = {
+clientId: '<social-client-id>',
+clientSecret: '<social-client-secret>',
+redirectUri: '<redirect-uri>',
+region: '<region>',
+userPoolId: '<user-pool-id>'
+};
+const provider = new IdentityProviderClientJS('<region>', '<cognito-client-id>', socialAuthConfig);
+```
+Prerequisites
+Configure your Cognito User Pool to support federated identities for the desired social provider (e.g., Google, Facebook) in the AWS Console.
+Obtain the client ID, client secret, and redirect URI from the social provider’s developer console.
+Ensure the redirect URI matches the one configured in both the social provider and your Cognito User Pool.
+Social Login
+Performs authentication by exchanging a social provider’s authorization code for Cognito tokens. The authorization code is obtained from the social provider’s OAuth flow.
+
+```kotlin
+val providerType = SocialProvider.Google // or SocialProvider.Facebook
+provider.socialLogin(providerType, "<authorization-code>").fold(
+onSuccess = { response ->
+val idToken = response.AuthenticationResult.IdToken
+// Handle successful login, e.g., store tokens
+},
+onFailure = { exception ->
+when (exception) {
+is IdentityProviderException.SocialAuthFailed -> {
+// Handle social auth failure (e.g., invalid code)
+}
+is IdentityProviderException.InvalidSocialToken -> {
+// Handle invalid token
+}
+else -> {
+// Handle other errors (e.g., network issues)
+}
+}
+}
+)
+```
+
+```typescript
+import { SocialProvider } from '@liftric/cognito-idp';
+
+const providerType = SocialProvider.Google; // or SocialProvider.Facebook
+provider.socialLogin(providerType, '<authorization-code>')
+.then(response => {
+const idToken = response.AuthenticationResult.IdToken;
+// Handle successful login
+})
+.catch(error => {
+if (error instanceof IdentityProviderExceptionJS.SocialAuthFailed) {
+// Handle social auth failure
+} else if (error instanceof IdentityProviderExceptionJS.InvalidSocialToken) {
+// Handle invalid token
+} else {
+// Handle other errors
+}
+});
+```
+Notes
+The socialLogin method exchanges the authorization code for an ID token from the social provider, validates it, and signs in or signs up the user in Cognito.
+On success, the SignInResponse contains Cognito JWTs (IdToken, AccessToken, RefreshToken).
+Common errors include IdentityProviderException.SocialAuthFailed (e.g., invalid authorization code) and IdentityProviderException.InvalidSocialToken (e.g., expired token).
+Validate Social Token
+Validates a social provider’s ID token without performing a full login. Useful for verifying tokens independently.
+
+
+```kotlin
+val providerType = SocialProvider.Google
+provider.validateSocialToken(providerType, "<id-token>").fold(
+onSuccess = {
+// Token is valid
+},
+onFailure = { exception ->
+// Handle invalid or expired token
+}
+)
+```
+
+```typescript
+const providerType = SocialProvider.Google;
+provider.validateSocialToken(providerType, '<id-token>')
+.then(() => {
+// Token is valid
+})
+.catch(error => {
+// Handle invalid or expired token
+});
+```
+
 ## License
 
 Cognito-idp is available under the MIT license. See the LICENSE file for more info.
