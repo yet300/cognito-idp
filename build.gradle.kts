@@ -1,5 +1,6 @@
 import com.android.build.gradle.LibraryExtension
 import com.liftric.vault.GetVaultSecretTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import org.jetbrains.kotlin.gradle.tasks.*
 
@@ -63,7 +64,7 @@ kotlin {
             }
         }
         val commonTest by getting {
-            kotlin.srcDir("${buildDir}/gen")
+            kotlin.srcDir("${layout.buildDirectory}/gen")
             dependencies {
                 implementation(kotlin("test"))
                 implementation(kotlin("test-common"))
@@ -179,7 +180,7 @@ tasks {
     }
 
     val createJsEnvHack by creating {
-        outputs.dir("$buildDir/gen")
+        outputs.dir("${layout.buildDirectory}/gen")
 
         if (System.getenv("region") == null || System.getenv("clientId") == null) {
             // github ci provides region and clientId envs, locally we'll use vault directly
@@ -192,8 +193,8 @@ tasks {
                         (System.getenv("region") ?: this["client_region_dev"].toString()))
             }
 
-            mkdir("$buildDir/gen")
-            with(File("$buildDir/gen/env.kt")) {
+            mkdir("${layout.buildDirectory}/gen")
+            with(File("${layout.buildDirectory}/gen/env.kt")) {
                 createNewFile()
                 writeText(
                     """
@@ -212,11 +213,10 @@ tasks {
     }
 
     withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "11"
-            languageVersion = "1.5"
-            freeCompilerArgs = listOf(
-                "-Xinline-classes"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.set(
+                listOf("-Xinline-classes")
             )
         }
     }
@@ -243,7 +243,7 @@ tasks {
             }
         }
 
-        val dTsFile = file("$buildDir/js/packages/cognito-idp/kotlin/cognito-idp.d.ts")
+        val dTsFile = file("${layout.buildDirectory}/js/packages/cognito-idp/kotlin/cognito-idp.d.ts")
         inputs.file(dTsFile)
         outputs.file(dTsFile)
 
