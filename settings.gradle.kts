@@ -28,13 +28,13 @@ dependencyResolutionManagement {
             library("kotlinx-coroutines", "org.jetbrains.kotlinx", "kotlinx-coroutines-core").version("1.7.2")
             library("kotlinx-serialization", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version("1.5.1")
             library("androidx-test-core", "androidx.test", "core").version("1.2.0")
-            library("roboelectric", "org.robolectric", "robolectric").version("4.9")
-            library("opt-java", "com.github.bastiaanjansen", "otp-java").version("1.3.2")
+            library("roboelectric", "org.robolectric", "robolectric").version("4.14.1")
+            library("opt-java", "com.github.bastiaanjansen", "otp-java").version("2.1.0")
 
-            plugin("vault-client", "com.liftric.vault-client-plugin").version("2.0.0")
-            plugin("versioning", "net.nemerosa.versioning").version("3.0.0")
-            plugin("npm-publishing", "dev.petuska.npm.publish").version("3.0.0")
-            plugin("definitions", "io.github.turansky.kfc.definitions").version("5.50.0")
+            plugin("vault-client", "com.liftric.vault-client-plugin").version("3.0.0")
+            plugin("versioning", "net.nemerosa.versioning").version("3.1.0")
+            plugin("npm-publishing", "dev.petuska.npm.publish").version("3.5.3")
+            plugin("definitions", "io.github.turansky.kfc.definitions").version("5.124.0")
             plugin("kotlin.serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
         }
     }
